@@ -1,12 +1,19 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import time
 
-# Inisialisasi WebDriver
-driver = webdriver.Chrome(executable_path='/opt/homebrew/bin/chromedriver')
+# Lokasi chromedriver
+chromedriver_path = '/opt/homebrew/bin/chromedriver'
+
+# Inisialisasi Service
+service = Service(chromedriver_path)
+
+# Inisialisasi WebDriver dengan service
+driver = webdriver.Chrome(service=service)
 
 # Akses halaman
 url = 'https://sscasn.bkn.go.id/#/daftarFormasi'
@@ -15,36 +22,39 @@ driver.get(url)
 # Tunggu halaman untuk load sepenuhnya
 time.sleep(5)  # Menunggu elemen menjadi visible
 
+# Tunggu hingga elemen input untuk Jenjang Pendidikan tersedia
+wait = WebDriverWait(driver, 10)
+
 # Isi Jenjang Pendidikan
-jenjang_field = driver.find_element(By.XPATH, '//div[contains(@class, "css-1d8n9bt")]//input')
+jenjang_field = wait.until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="--- Pilih Jenjang Pendidikan ---"]')))
 jenjang_field.click()
 time.sleep(1)  # Delay untuk menunggu dropdown muncul
 jenjang_field.send_keys('S-1/Sarjana')
 jenjang_field.send_keys('\ue007')  # Simbol Enter
 
 # Isi Program Studi
-program_studi_field = driver.find_element(By.XPATH, '//div[contains(@class, "css-1d8n9bt")]//input')
+program_studi_field = wait.until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="--- Pilih Program Studi ---"]')))
 program_studi_field.click()
 time.sleep(1)
 program_studi_field.send_keys('TEKNIK INFORMATIKA')
 program_studi_field.send_keys('\ue007')
 
 # Isi Jenis Pengadaan
-jenis_pengadaan_field = driver.find_element(By.XPATH, '//div[contains(@class, "css-1d8n9bt")]//input')
+jenis_pengadaan_field = wait.until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="--- Pilih Jenis Pengadaan ---"]')))
 jenis_pengadaan_field.click()
 time.sleep(1)
 jenis_pengadaan_field.send_keys('CPNS')
 jenis_pengadaan_field.send_keys('\ue007')
 
 # Klik tombol CARI
-cari_button = driver.find_element(By.XPATH, '//button[contains(text(), "CARI")]')
+cari_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//a[contains(text(), "CARI")]')))
 cari_button.click()
 
 # Tunggu hasil pencarian muncul
 time.sleep(5)
 
 # Temukan tabel
-table = driver.find_element(By.XPATH, '//table')
+table = wait.until(EC.presence_of_element_located((By.XPATH, '//table')))
 
 # Ambil semua baris dalam tabel
 rows = table.find_elements(By.TAG_NAME, "tr")
