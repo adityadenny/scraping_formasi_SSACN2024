@@ -23,7 +23,7 @@ driver.get(url)
 time.sleep(5)  # Menunggu elemen menjadi visible
 
 # Tunggu hingga elemen input untuk Jenjang Pendidikan tersedia
-wait = WebDriverWait(driver, 10)
+wait = WebDriverWait(driver, 20)
 
 # Isi Jenjang Pendidikan
 jenjang_field = wait.until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="--- Pilih Jenjang Pendidikan ---"]')))
@@ -47,14 +47,22 @@ jenis_pengadaan_field.send_keys('CPNS')
 jenis_pengadaan_field.send_keys('\ue007')
 
 # Klik tombol CARI
-cari_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//a[contains(text(), "CARI")]')))
+cari_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="button" and @class="ant-btn css-3rel02 ant-btn-default ant-btn-icon-only ant-input-search-button"]')))
 cari_button.click()
 
 # Tunggu hasil pencarian muncul
 time.sleep(5)
 
-# Temukan tabel
-table = wait.until(EC.presence_of_element_located((By.XPATH, '//table')))
+# Pilih Formasi "Umum"
+formasi_dropdown = wait.until(EC.presence_of_element_located((By.XPATH, '//div[contains(@class, "ant-select-selector")]')))
+formasi_dropdown.click()
+time.sleep(1)
+
+formasi_umum_option = wait.until(EC.presence_of_element_located((By.XPATH, '//div[contains(@class, "ant-select-item-option-content") and text()="UMUM"]')))
+formasi_umum_option.click()
+
+# Tunggu tabel muncul setelah memilih formasi
+table = wait.until(EC.presence_of_element_located((By.XPATH, '//div[@class="ant-table-container"]//table')))
 
 # Ambil semua baris dalam tabel
 rows = table.find_elements(By.TAG_NAME, "tr")
